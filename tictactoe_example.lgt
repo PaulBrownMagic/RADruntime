@@ -91,8 +91,7 @@
 :- end_object.
 
 
-:- object(game_over,
-    extends(fluent)).
+:- object(game_over, extends(fluent)).
 
     holds(S) :-
         has_won(_)::holds(S)
@@ -102,8 +101,7 @@
 :- end_object.
 
 
-:- object(player_turn(_C_),
-    extends(fluent)).
+:- object(player_turn(_C_), extends(fluent)).
 
     holds(s0) :-
         _C_ = x.
@@ -117,8 +115,7 @@
 :- end_object.
 
 
-:- object(prior_player_turn(_C_),
-    extends(fluent)).
+:- object(prior_player_turn(_C_), extends(fluent)).
 
    holds(do(_, S)) :-
        player_turn(_C_)::holds(S).
@@ -126,8 +123,7 @@
 :- end_object.
 
 
-:- object(move(_C_, _N_),
-    extends(action)).
+:- object(move(_C_, _N_), extends(action)).
 
     poss(S) :-
         situation::holds(player_turn(_C_) and available_move(_N_), S).
@@ -178,6 +174,8 @@
 
 :- object(tictactoe).
 
+    :- set_logtalk_flag(events, allow).
+
     :- public(init/0).
     init :-
         rapp::init_sit(s0),
@@ -190,8 +188,6 @@
         situation::holds(player_turn(C) and not game_over, S),
         choose_move(C, S, M),
         rapp::do(move(C, M)), !,
-        rapp::sit(NS),
-        unicode_terminal::render(NS), % shouldn't need to call this
         play.
     play :-
         rapp::sit(S),
