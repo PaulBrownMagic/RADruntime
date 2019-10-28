@@ -23,18 +23,20 @@
 :- object(view,
     implements(monitoring)).
 
+    :- uses(logtalk, [
+        print_message/3
+    ]).
+
     after(radruntime, update(Action), _Sender) :-
-        format("Did ~q~n", Action),
+        print_message(information, rad, 'Did'-Action),
         radruntime::sit(S),
         ::render(S).
 
     :- public(render/1).
-    render(S) :-
-        writeln('Fluents'),
-        forall(situation::holds(F, S), writeln(F)),
-        nl,
-        writeln('Actions'),
-        forall(situation::poss(A, S), writeln(A)).
+    render(State) :-
+        findall(Fluent, situation::holds(Fluent, State), Fluents),
+        print_message(information, rad, 'Fluents'::Fluents),
+        findall(Action, situation::poss(Action, State), Actions),
+        print_message(information, rad, 'Actions'::Actions).
 
 :- end_object.
-
