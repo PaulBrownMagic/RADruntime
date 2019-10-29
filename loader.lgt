@@ -4,6 +4,5 @@
                  , random(loader)
                  , tictactoe_example
                  ]),
-    set_logtalk_flag(events, allow),
-    define_events(after, _, do(_), _, unicode_terminal)
+    define_events(after, sm, do(_), _, unicode_terminal)
              )).

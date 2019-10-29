@@ -50,8 +50,10 @@
 :- end_object.
 
 
-:- category(actor).
+:- category(actorc).
     :- public(action/1).
+
+    :- set_logtalk_flag(events, allow).
 
     :- public(do/1).
     :- meta_predicate(do(2)).
@@ -68,7 +70,7 @@
 :- end_category.
 
 
-:- object(smo).
+:- category(fluentc).
 
     :- public(holds/1).
     :- meta_predicate(holds(1)).
@@ -76,10 +78,10 @@
         sm::sit(S),
         call(::Fluent, S).
 
-:- end_object.
+:- end_category.
 
 
-:- object(view,
+:- category(view,
     implements(monitoring)).
 
     :- info([ version is 1.0
@@ -89,8 +91,7 @@
             ]).
 
     % Monitor for actions being done in the application and upate the view
-    after(Ob, do(Action), _Sender) :-
-        format("~q did ~q~n", [Ob, Action]),
+    after(sm, do(_), _Sender) :-
         sm::sit(S),
         ::render(S).
 
@@ -101,4 +102,4 @@
         , argnames is ['Situation']
         ]).
 
-:- end_object.
+:- end_category.

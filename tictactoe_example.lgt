@@ -1,5 +1,5 @@
 :- object(board,
-    extends(smo)).
+    imports(fluentc)).
 
      :- public(grid/2).
      grid([ [1, 2, 3]
@@ -34,7 +34,7 @@
 
 
 :- object(game,
-    extends(smo)).
+    imports(fluentc)).
 
    :- public(is_draw/1).
    is_draw(Sit) :-
@@ -63,8 +63,7 @@
 
 
 :- object(player(_C_),
-    imports(actor),
-    extends(smo)).
+    imports([actorc, fluentc])).
 
     action(move(_C_, _)).
 
@@ -198,7 +197,7 @@
 :- end_object.
 
 
-:- object(unicode_terminal, extends(view)).
+:- object(unicode_terminal, imports(view)).
 
     render(Sit) :-
         board::grid(Board, Sit),
@@ -236,7 +235,6 @@
 
 :- object(tictactoe).
 
-    :- set_logtalk_flag(events, allow).
 
     :- public(init/0).
     init :-
