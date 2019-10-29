@@ -132,7 +132,7 @@
     extends(player(_C_))).
 
     choose_move(N, Sit) :-
-        choose_move(_Difficulty_, N, Sit).
+        choose_move(_Difficulty_, N, Sit), !.
 
     :- public(choose_move/3).
     :- mode(choose_move(+atom, +list, -integer), zero_or_more).
@@ -143,10 +143,10 @@
     choose_move(easy, N, Sit) :-
         choose_random_member(N, [1, 2, 3, 4, 5, 6, 7, 8, 9]),
         board::available_move(N, Sit), !,
-        write('Computer choooses '), write(N), nl.
+        write('Computer chooses '), write(N), nl.
     choose_move(hard, N, Sit) :-
         ai_choose_move(N, Sit),
-        write('Computer choooses '), write(N), nl.
+        write('Computer chooses '), write(N), nl.
 
     :- private(ai_choose_move/2).
     :- mode(ai_choose_move(+list, -integer), zero_or_one).
@@ -192,8 +192,8 @@
 
     poss(S) :-
         game::player_turn(P, S),
-        P::choose_move(_N_, S), !,
-        P::char(_C_).
+        P::char(_C_),
+        board::available_move(_N_, S).
 
 :- end_object.
 
@@ -249,7 +249,8 @@
         sm::sit(S),
         \+ game::over(S),
         game::current_player(P, S),
-        P::do(move(_C, _N)), !,
+        P::choose_move(N, S),
+        P::do(move(_C, N)), !,
         play.
     play :-
         sm::sit(S),
