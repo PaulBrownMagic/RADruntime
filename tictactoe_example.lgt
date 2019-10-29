@@ -247,13 +247,13 @@
     :- public(play/0).
     play :-
         sm::sit(S),
-        \+ game::over(S),
-        game::current_player(P, S),
-        P::choose_move(N, S),
-        P::do(move(_C, N)), !,
-        play.
-    play :-
-        sm::sit(S),
-        game::over(S).
+        ( \+ game::over(S),
+          game::player_turn(P, S),
+          P::choose_move(N, S),
+          P::do(move(_C, N)), !,
+          play
+        ;
+          game::over(S)
+        ).
 
 :- end_object.
