@@ -1,59 +1,82 @@
-:- object(board(_Board_), extends(fluent)).
+:- object(board,
+    extends(smo)).
 
-    holds(s0) :-
-        _Board_ = [ [1, 2, 3]
-                  , [4, 5, 6]
-                  , [7, 8, 9]
-                  ].
+     :- public(grid/2).
+     grid([ [1, 2, 3]
+          , [4, 5, 6]
+          , [7, 8, 9]
+          ], s0).
+     grid(G, do(move(C, N), S)) :-
+         grid(Old, S),
+         update(N, C, Old, G).
+     grid(G, do(A, S)) :-
+         A \= move(_, _),
+         grid(G, S).
 
-    holds(do(A, S)) :-
-        A = move(C, N),
-        board(Old)::holds(S),
-        update(N, C, Old).
-    holds(do(A, S)) :-
-        A \= move(_, _),
-        holds(S).
+     :- public(available_move/2).
+     available_move(N, S) :-
+         grid(G, S),
+         list::flatten(G, Flat),
+         list::member(N, Flat),
+         integer(N).
 
-    update(N, C, [R1, R2, R3]) :-
+    update(N, C, [R1, R2, R3], [N1, R2, R3]) :-
         % In row 1
-        list::select(N, R1, C, N1),
-        _Board_ = [N1, R2, R3], !.
-    update(N, C, [R1, R2, R3]) :-
+        list::select(N, R1, C, N1), !.
+    update(N, C, [R1, R2, R3], [R1, N2, R3]) :-
         % In row 2
-        list::select(N, R2, C, N2),
-        _Board_ = [R1, N2, R3], !.
-    update(N, C, [R1, R2, R3]) :-
+        list::select(N, R2, C, N2), !.
+    update(N, C, [R1, R2, R3], [R1, R2, N3]) :-
         % In row 3
-        list::select(N, R3, C, N3),
-        _Board_ = [R1, R2, N3], !.
+        list::select(N, R3, C, N3), !.
 
 :- end_object.
 
 
-:- object(available_move(_N_), extends(fluent)).
+:- object(game,
+    extends(smo)).
 
-    holds(S) :-
-        board(B)::holds(S),
-        list::flatten(B, Flat),
-        list::member(_N_, Flat),
-        integer(_N_).
+   :- public(is_draw/1).
+   is_draw(Sit) :-
+       \+ board::available_move(_, Sit).
+
+   :- public(over/1).
+   over(Sit) :-
+       ::is_draw(Sit)
+       ; ::current_player(P, Sit), P::has_won(Sit).
+
+   :- public(current_player/2).
+   current_player(P, _Sit) :-
+       P = human(x)
+       ;
+       P = computer(o, easy).
+
+   :- public(player_turn/2).
+   player_turn(human(x), s0).
+   player_turn(human(x), do(_, S)) :-
+       player_turn(computer(o, _), S).
+   player_turn(computer(o, D), do(A, S)) :-
+       player_turn(human(x), S),
+       current_player(computer(o, D), do(A, S)).
 
 :- end_object.
 
 
-:- object(is_draw, extends(fluent)).
+:- object(player(_C_),
+    imports(actor),
+    extends(smo)).
 
-   holds(S) :-
-       \+ available_move(_)::holds(S).
+    action(move(_C_, _)).
 
-:- end_object.
+    :- public(char/1).
+    char(_C_).
 
+    :- public(choose_move/2).
 
-:- object(has_won(_C_), extends(fluent)).
-
-    holds(S) :-
-        board(B)::holds(S),
-        has_won(_C_, B).
+    :- public(has_won/1).
+    has_won(Sit) :-
+        board::grid(G, Sit),
+        has_won(_C_, G).
 
     has_won(C, [ [C, C, C]
                , [_, _, _]
@@ -91,34 +114,76 @@
 :- end_object.
 
 
-:- object(game_over, extends(fluent)).
+:- object(human(_C_),
+    extends(player(_C_))).
 
-    holds(S) :-
-        has_won(_)::holds(S)
-        ;
-        is_draw::holds(S).
-
-:- end_object.
-
-
-:- object(player_turn(_C_), extends(fluent)).
-
-    holds(s0) :-
-        _C_ = x.
-    holds(do(_, S)) :-
-        player_turn(x)::holds(S),
-        _C_ = o.
-    holds(do(_, S)) :-
-        player_turn(o)::holds(S),
-        _C_ = x.
+    choose_move(N, Sit) :-
+        write('Where should '), write(_C_), write(' go?\n'),
+        read(N), integer(N),
+        board::available_move(N, Sit)
+    ; % Move is invalid, notify and recurse
+        write('Can''t make that move\n'),
+        choose_move(N, Sit).
 
 :- end_object.
 
 
-:- object(prior_player_turn(_C_), extends(fluent)).
+:- object(computer(_C_, _Difficulty_),
+    extends(player(_C_))).
 
-   holds(do(_, S)) :-
-       player_turn(_C_)::holds(S).
+    choose_move(N, Sit) :-
+        choose_move(_Difficulty_, N, Sit).
+
+    :- public(choose_move/3).
+    :- mode(choose_move(+atom, +list, -integer), zero_or_more).
+    :- info(choose_move/3,
+        [ comment is 'Choose a move using the strategy appropriate for the Difficulty'
+        , argnames is ['Difficulty', 'Board', 'Move']
+        ]).
+    choose_move(easy, N, Sit) :-
+        choose_random_member(N, [1, 2, 3, 4, 5, 6, 7, 8, 9]),
+        board::available_move(N, Sit), !,
+        write('Computer choooses '), write(N), nl.
+    choose_move(hard, N, Sit) :-
+        ai_choose_move(N, Sit),
+        write('Computer choooses '), write(N), nl.
+
+    :- private(ai_choose_move/2).
+    :- mode(ai_choose_move(+list, -integer), zero_or_one).
+    :- info(ai_choose_move/2,
+        [ comment is 'Use a strategy to choose a move'
+        , argnames is ['Board', 'GridNumber']
+        ]).
+    ai_choose_move(N, Sit) :-
+        % Computer can win
+        board::available_move(N, Sit),
+        ^^has_won(do(move(_C_, N), Sit)), !.
+    ai_choose_move(N, Sit) :-
+        % Player can win
+        board::available_move(N, Sit),
+        human(x)::has_won(do(move(x, N), Sit)), !.
+    ai_choose_move(N, Sit) :-
+        % Pick a corner
+        choose_random_member(N, [1, 3, 7, 9]),
+        board::available_move(N, Sit), !.
+    ai_choose_move(5, Sit) :-
+        % Pick the center
+        board::available_move(5, Sit), !.
+    ai_choose_move(N, Sit) :-
+        % Pick a middle
+        choose_random_member(N, [2, 4, 6, 8]),
+        board::available_move(N, Sit), !.
+
+    :- private(choose_random_member/2).
+    :- mode(choose_random_member(-any, +list), zero_or_more).
+    :- info(choose_random_member/2,
+        [ comment is 'Yield elements from list in random order'
+        , argnames is ['Elem', 'List']
+        ]).
+    choose_random_member(N, L) :-
+        fast_random::permutation(L, NL),
+        list::member(N, NL).
+
 
 :- end_object.
 
@@ -126,7 +191,9 @@
 :- object(move(_C_, _N_), extends(action)).
 
     poss(S) :-
-        situation::holds(player_turn(_C_) and available_move(_N_), S).
+        game::player_turn(P, S),
+        P::choose_move(_N_, S), !,
+        P::char(_C_).
 
 :- end_object.
 
@@ -134,17 +201,12 @@
 :- object(unicode_terminal, extends(view)).
 
     render(Sit) :-
-        situation::holds(board(Board) and prior_player_turn(C), Sit),
+        board::grid(Board, Sit),
         print_board(Board),
-        ( has_won(C)::holds(Sit), congratulate(C)
-        ; is_draw::holds(Sit), write('It''s a draw\n')
+        ( player(C)::has_won(Sit), congratulate(C)
+        ; game::is_draw(Sit), write('It''s a draw\n')
         ; true
         ).
-    render(Sit) :-
-        situation::holds(board(Board) and not prior_player_turn(_), Sit),
-        print_board(Board).
-
-
 
     :- public(print_board/1).
     print_board([R1, R2, R3]) :-
@@ -178,42 +240,19 @@
 
     :- public(init/0).
     init :-
-        rapp::init_sit(s0),
+        sm::init_sit(s0),
         unicode_terminal::render(s0),
         play.
 
     :- public(play/0).
     play :-
-        rapp::sit(S),
-        situation::holds(player_turn(C) and not game_over, S),
-        choose_move(C, S, M),
-        rapp::do(move(C, M)), !,
+        sm::sit(S),
+        \+ game::over(S),
+        game::current_player(P, S),
+        P::do(move(_C, _N)), !,
         play.
     play :-
-        rapp::sit(S),
-        game_over::holds(S).
-
-    choose_move(x, S, N) :-
-        write('Where should X go?\n'),
-        read(N), integer(N),
-        available_move(N)::holds(S)
-    ; % Move is invalid, notify and recurse
-        write('Can''t make that move\n'),
-        choose_move(x, S, N).
-
-    choose_move(o, S, N) :-
-        choose_random_member(N, [1, 2, 3, 4, 5, 6, 7, 8, 9]),
-        available_move(N)::holds(S),
-        write('Computer choooses '), write(N), nl.
-
-    :- private(choose_random_member/2).
-    :- mode(choose_random_member(-any, +list), zero_or_more).
-    :- info(choose_random_member/2,
-        [ comment is 'Yield elements from list in random order'
-        , argnames is ['Elem', 'List']
-        ]).
-    choose_random_member(N, L) :-
-        fast_random::permutation(L, NL),
-        list::member(N, NL).
+        sm::sit(S),
+        game::over(S).
 
 :- end_object.

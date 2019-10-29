@@ -1,9 +1,9 @@
-:- object(rapp).
+:- object(sm).
 
     :- info([ version is 1.0
             , author is 'Paul Brown'
             , date is 2019/10/27
-            , comment is 'A prototype for rapid app development.'
+            , comment is 'A Situation Manager.'
             ]).
 
     :- public(sit/1).
@@ -40,8 +40,39 @@
         ]).
     do(A) :-
         ::sit(S),
+        do(A, S).
+
+    :- public(do/2).
+    do(A, S) :-
         A::do(S, S1),
         clobber_sit(S1).
+
+:- end_object.
+
+:- category(actor).
+    :- public(action/1).
+
+    :- public(do/1).
+    :- meta_predicate(do(2)).
+    do(A) :-
+        ::action(A),
+        sm::do(A).
+
+    :- public(do/2).
+    :- meta_predicate(do(2, *)).
+    do(A, Sit) :-
+        ::action(A),
+        sm::do(A, Sit).
+
+:- end_category.
+
+:- object(smo).
+
+    :- public(holds/1).
+    :- meta_predicate(holds(1)).
+    holds(Fluent) :-
+        sm::sit(S),
+        call(::Fluent, S).
 
 :- end_object.
 
@@ -56,9 +87,9 @@
             ]).
 
     % Monitor for actions being done in the application and upate the view
-    after(rapp, do(Action), _Sender) :-
-        format("Did ~q~n", Action),
-        rapp::sit(S),
+    after(Ob, do(Action), _Sender) :-
+        format("~q did ~q~n", [Ob, Action]),
+        sm::sit(S),
         ::render(S).
 
     :- public(render/1).
