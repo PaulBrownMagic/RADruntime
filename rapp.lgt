@@ -32,7 +32,7 @@
         asserta(sit(S)).
 
     :- public(do/1).
-%:- synchronized(do/1).
+    :- synchronized(do/1).
     :- mode(do(+object), zero_or_one).
     :- info(do/1,
         [ comment is 'Do the Action in the application, thread-safe.'
@@ -48,6 +48,7 @@
         clobber_sit(S1).
 
 :- end_object.
+
 
 :- category(actor).
     :- public(action/1).
@@ -65,6 +66,7 @@
         sm::do(A, Sit).
 
 :- end_category.
+
 
 :- object(smo).
 
