@@ -1,5 +1,6 @@
-:- object(board,
-    imports(fluentc)).
+:- object(board, imports(fluentc)).
+     fluent(grid/2).
+     fluent(available_move/2).
 
      :- public(grid/2).
      grid([ [1, 2, 3]
@@ -33,8 +34,11 @@
 :- end_object.
 
 
-:- object(game,
-    imports(fluentc)).
+:- object(game, imports(fluentc)).
+   fluent(is_draw/1).
+   fluent(over/1).
+   fluent(current_player/2).
+   fluent(player_turn/2).
 
    :- public(is_draw/1).
    is_draw(Sit) :-
@@ -72,10 +76,10 @@
 :- end_object.
 
 
-:- object(player(_C_),
-    imports([actorc, fluentc])).
+:- object(player(_C_), imports([actorc, fluentc])).
 
-    action(move(_C_, _)).
+    action(move/2).
+    fluent(has_won/1).
 
     :- public(char/1).
     char(_C_).
@@ -123,8 +127,7 @@
 :- end_object.
 
 
-:- object(human(_C_),
-    extends(player(_C_))).
+:- object(human(_C_), extends(player(_C_))).
 
     choose_move(N) :-
         write('Where should '), write(_C_), write(' go?\n'),
@@ -137,8 +140,7 @@
 :- end_object.
 
 
-:- object(computer(_C_, _Difficulty_),
-    extends(player(_C_))).
+:- object(computer(_C_, _Difficulty_), extends(player(_C_))).
 
     choose_move(N) :-
         choose_move(_Difficulty_, N), !.
@@ -248,7 +250,8 @@
     turn :-
         ( sm::holds(game::player_turn(P) and not game::over),
           P::choose_move(N),
-          P::do(move(_C, N)), !,
+          P::char(C),
+          P::do(move(C, N)), !,
           turn
         ;
           game::holds(over)
