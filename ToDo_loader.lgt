@@ -13,8 +13,9 @@
                      , rapp
                      , persistency
                      , todo
+                     , todo_xpce
                      ]),
-        define_events(after, sm, do(_), _, xpce_view),
+        define_events(after, sm, do(_), _, todo_view),
         define_events(after, sm, do(_), _, persistency)
                  )).
 
