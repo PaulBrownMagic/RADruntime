@@ -47,6 +47,11 @@
         A::do(S, S1),
         clobber_sit(S1).
 
+    :- public(holds/1).
+    holds(F) :-
+        sm::sit(S),
+        situation::holds(F, S).
+
 :- end_object.
 
 

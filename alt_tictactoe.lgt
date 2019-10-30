@@ -246,8 +246,7 @@
 
     :- public(turn/0).
     turn :-
-        ( \+ game::holds(over),
-          game::holds(player_turn(P)),
+        ( sm::holds(game::player_turn(P) and not game::over),
           P::choose_move(N),
           P::do(move(_C, N)), !,
           turn
