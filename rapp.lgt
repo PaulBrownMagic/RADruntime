@@ -63,7 +63,8 @@
     :- public(do/1).
     :- meta_predicate(do(2)).
     do(A) :-
-        ::action(A),
+        functor(A, Func, Ar),
+        ::action(Func/Ar),
         sm::do(A).
 
     :- public(do/2).
@@ -76,6 +77,7 @@
 
 
 :- category(fluentc).
+    :- public(fluent/1).
 
     :- public(holds/1).
     :- meta_predicate(holds(1)).

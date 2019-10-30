@@ -2,9 +2,10 @@
 :- object(todos,
     imports([fluentc, actorc])).
 
-   action(add_todo(_)).
-   action(remove_todo(_)).
-   action(mark_complete(_)).
+   action(add_todo/1).
+   action(remove_todo/1).
+   action(mark_complete/1).
+   fluent(current_todo/2).
 
    :- public(current_todo/2).
    current_todo(todo(Label, Status), do(A, S)) :-
