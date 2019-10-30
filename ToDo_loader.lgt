@@ -8,7 +8,7 @@
 		logtalk_load_context(directory, Directory),
 		atom_concat(Directory, xpce_hooks, Path),
 		consult(Path),
-        logtalk_load([ my_library(sitcalc)
+        logtalk_load([ sitcalc(loader)
                      , os(loader)
                      , rapp
                      , persistency

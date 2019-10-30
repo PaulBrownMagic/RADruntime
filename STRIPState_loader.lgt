@@ -1,5 +1,5 @@
 :- initialization((
-    logtalk_load([ my_library(stripstate)
+    logtalk_load([ stripstate(loader)
                  , rapp
                  , random(loader)
                  , 'STRIPState_tictactoe' %_example

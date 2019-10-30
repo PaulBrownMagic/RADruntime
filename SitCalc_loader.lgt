@@ -1,5 +1,5 @@
 :- initialization((
-    logtalk_load([ my_library(sitcalc)
+    logtalk_load([ sitcalc(loader)
                  , rapp
                  , meta(loader)
                  , random(loader)
