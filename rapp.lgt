@@ -82,6 +82,9 @@
     :- public(holds/1).
     :- meta_predicate(holds(1)).
     holds(Fluent) :-
+        functor(Fluent, Func, Ar),
+        NAr is Ar + 1,
+        ::fluent(Func/NAr),
         sm::sit(S),
         call(::Fluent, S).
 

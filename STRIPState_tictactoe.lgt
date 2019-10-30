@@ -1,5 +1,7 @@
 :- object(board,
     imports(fluentc)).
+     fluent(grid/2).
+     fluent(available_move/2).
 
      :- public(grid/2).
      grid(G, S) :-
@@ -29,6 +31,10 @@
 
 :- object(game,
     imports(fluentc)).
+   fluent(is_draw/1).
+   fluent(over/1).
+   fluent(current_player/2).
+   fluent(player_turn/2).
 
    :- public(is_draw/1).
    is_draw(Sit) :-
@@ -76,8 +82,8 @@
 
 :- object(player(_C_),
     imports([actorc, fluentc])).
-
-    action(move(_C_, _)).
+    action(move/2).
+    fluent(has_won/1).
 
     :- public(char/1).
     char(_C_).
@@ -258,7 +264,8 @@
     turn :-
         ( sm::holds(game::player_turn(P) and not game::over),
           P::choose_move(N),
-          P::do(move(_C, N)), !,
+          P::char(C),
+          P::do(move(C, N)), !,
           turn
         ;
           game::holds(over)
