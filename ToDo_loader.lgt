@@ -9,10 +9,13 @@
 		atom_concat(Directory, xpce_hooks, Path),
 		consult(Path),
         logtalk_load([ my_library(sitcalc)
+                     , os(loader)
                      , rapp
+                     , persistency
                      , todo
                      ]),
-        define_events(after, sm, do(_), _, xpce_view)
+        define_events(after, sm, do(_), _, xpce_view),
+        define_events(after, sm, do(_), _, persistency)
                  )).
 
 :- else.

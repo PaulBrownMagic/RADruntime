@@ -274,13 +274,14 @@
 
     :- public(init/0).
     init :-
-        sm::init_sit(s0),
+        persistency::restore(Sit),
         window::init,
         todo_dialog::init,
         todo_browser::init,
         completed_dialog::init,
         completed_browser::init,
         app_dialog::init,
+        xpce_view::render(Sit),
         !.
 
     :- public(close/0).
