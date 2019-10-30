@@ -4,7 +4,7 @@
      :- public(grid/2).
      grid(G, S) :-
          self(Self),
-         list::member(grid(Self, G), S).
+         situation::holds(grid(Self, G), S).
 
      :- public(available_move/2).
      available_move(N, S) :-
@@ -42,12 +42,12 @@
    :- public(current_player/2).
    current_player(P, Sit) :-
        self(Self),
-       list::member(current_player(Self, P), Sit).
+       situation::holds(current_player(Self, P), Sit).
 
    :- public(player_turn/2).
    player_turn(P, S) :-
        self(Self),
-       list::member(player_turn(Self, P), S).
+       situation::holds(player_turn(Self, P), S).
 
 :- end_object.
 
