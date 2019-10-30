@@ -49,7 +49,7 @@
    current_player(P, _Sit) :-
        P = human(x)
        ;
-       P = computer(o, easy).
+       P = computer(o, hard).
 
    :- public(player_turn/2).
    player_turn(human(x), s0).
@@ -65,8 +65,8 @@
 :- object(move(_C_, _N_), extends(action)).
 
     poss(S) :-
-        game::player_turn(P, S),
-        P::char(_C_),
+        % game::player_turn(P, S),
+        % P::char(_C_),
         board::available_move(_N_, S).
 
 :- end_object.

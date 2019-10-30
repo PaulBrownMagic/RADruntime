@@ -55,8 +55,8 @@
 :- object(move(_C_, _N_), extends(action)).
 
     poss(S) :-
-        game::player_turn(P, S),
-        P::char(_C_),
+        % game::player_turn(P, S),
+        % P::char(_C_),
         board::available_move(_N_, S).
 
     retract_fluents([ grid(board, _)
@@ -248,7 +248,7 @@
                           ])
             , player_turn(game, human(x))
             , current_player(game, human(x))
-            , current_player(game, computer(o, easy))
+            , current_player(game, computer(o, hard))
             ],
         sm::init_sit(S),
         unicode_terminal::render(S),
@@ -256,8 +256,7 @@
 
     :- public(turn/0).
     turn :-
-        ( \+ game::holds(over),
-          game::holds(player_turn(P)),
+        ( sm::holds(game::player_turn(P) and not game::over),
           P::choose_move(N),
           P::do(move(_C, N)), !,
           turn
