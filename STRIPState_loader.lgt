@@ -1,8 +1,8 @@
 :- initialization((
-    logtalk_load([ my_library(sitcalc)
+    logtalk_load([ my_library(stripstate)
                  , rapp
                  , random(loader)
-                 , alt_tictactoe %_example
+                 , 'STRIPState_tictactoe' %_example
                  ]),
     define_events(after, sm, do(_), _, unicode_terminal)
              )).
