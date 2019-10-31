@@ -6,17 +6,25 @@
 
     :- initialization((
 		logtalk_load_context(directory, Directory),
-		atom_concat(Directory, xpce_hooks, Path),
-		consult(Path),
+		atom_concat(Directory, xpce_hooks, XPath),
+		atom_concat(Directory, web_hooks, WPath),
+		consult(XPath),
+		consult(WPath),
         logtalk_load([ sitcalc(loader)
                      , os(loader)
+                     , random(loader)
                      , rapp
                      , persistency
                      , todo
-                     , todo_xpce
                      ]),
         define_events(after, sm, do(_), _, todo_view),
-        define_events(after, sm, do(_), _, persistency)
+        define_events(after, sm, do(_), _, persistency),
+        persistency::restore(_),
+        logtalk_load([ todo_xpce
+                     , todo_web
+                     ]),
+        server::serve,
+        app::init
                  )).
 
 :- else.

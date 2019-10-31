@@ -54,9 +54,12 @@
 
     render(Sit) :-
         findall(ToDo, situation::holds(todos::current_todo(ToDo), Sit), ToDos),
-        print_message(information, rad, 'ToDos'::ToDos),
-        findall(Action, situation::poss(Action, Sit), Actions),
-        print_message(information, rad, 'PossActions'::Actions).
+        print_message(information, rad, 'WebToDos'::ToDos),
+        print_message(information, rad, 'XPCEToDos'::ToDos).
+        /*
+         *findall(Action, situation::poss(Action, Sit), Actions),
+         *print_message(information, rad, 'PossActions'::Actions).
+         */
 
 :- end_object.
 

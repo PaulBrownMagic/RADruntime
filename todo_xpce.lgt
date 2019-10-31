@@ -206,13 +206,13 @@
 
     :- public(init/0).
     init :-
-        persistency::restore(Sit),
         window::init,
         todo_dialog::init,
         todo_browser::init,
         completed_dialog::init,
         completed_browser::init,
         app_dialog::init,
+        sm::sit(Sit),
         todo_view::render(Sit),
         !.
 
@@ -237,13 +237,14 @@
 
     :- multifile(logtalk::message_hook/4).
     :- dynamic(logtalk::message_hook/4).
-    logtalk::message_hook('ToDos'::ToDos, information, rad, _Tokens) :-
-        meta::partition(=(todo(_, todo)), ToDos, ToDoIs, Completed),
+    logtalk::message_hook('XPCEToDos'::ToDos, information, rad, _Tokens) :-
+        meta::partition(is_current_todo, ToDos, ToDoIs, Completed),
         meta::map(todo_label, ToDoIs, TLs),
         meta::map(todo_label, Completed, CLs),
         todo_browser::update(TLs),
         completed_browser::update(CLs).
 
+    is_current_todo(todo(_, todo)).
     todo_label(todo(L, _), L).
 
 :- end_object.

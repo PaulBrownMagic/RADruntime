@@ -38,7 +38,7 @@
    % read in a list of repr Terms from persistent file
    read_terms(Terms) :-
        ::file(File), os::file_exists(File),
-       setup_call_cleanup(open(File, read, Stream), read(Stream, Terms), close(Stream)).
+       setup_call_cleanup(open(File, read, Stream), read(Stream, Terms), close(Stream)), !.
    read_terms(ET) :-
        \+ (::file(File), os::file_exists(File)),
        situation::empty(ET).
