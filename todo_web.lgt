@@ -29,7 +29,7 @@
 
 
 :- object(home_page).
-    :- use_module(library(http/html_write), [reply_html_page/2]).
+    :- use_module(html_write, [reply_html_page/2]).
     :- meta_predicate(html_write:reply_html_page(*, *)).
 
     :- public(get/0).
@@ -112,7 +112,7 @@
     receive :-
         ::websocket(WS),
         ws_receive(WS, Message),
-        ( Message.opcode == close
+        ( Message.opcode == close, self(Self), abolish_object(Self)
         ; handle(Message)
         ).
 
