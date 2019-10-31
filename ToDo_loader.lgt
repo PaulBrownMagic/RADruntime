@@ -14,12 +14,11 @@
                      , os(loader)
                      , random(loader)
                      , rapp
-                     , persistency
                      , todo
                      ]),
-        define_events(after, sm, do(_), _, todo_view),
-        define_events(after, sm, do(_), _, persistency),
-        persistency::restore(_),
+        persistent_manager::new(sm, 'todo_storage.pl'),
+        define_events(after, _, do(_), _, todo_view),
+        define_events(after, _, do(_, _), _, todo_view),
         logtalk_load([ todo_xpce
                      , todo_web
                      ]),
