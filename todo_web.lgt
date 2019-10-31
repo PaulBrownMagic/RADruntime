@@ -1,8 +1,8 @@
 :- object(server).
 
-    :- use_module(library(http/thread_httpd), [http_server/2]).
-    :- use_module(library(http/http_dispatch), [http_dispatch/1]).
-    :- use_module(library(http/websocket), [ws_send/2]).
+    :- use_module(thread_httpd, [http_server/2]).
+    :- use_module(http_dispatch, [http_dispatch/1]).
+    :- use_module(websocket, [ws_send/2]).
 
     :- meta_predicate(thread_httpd:http_server(1, *)).
     :- public(serve/0).
@@ -104,7 +104,7 @@
 
 :- object(todos_socket,
     instantiates(metasocket)).
-    :- use_module(library(http/websocket), [ws_receive/2]).
+    :- use_module(websocket, [ws_receive/2]).
 
     :- public(websocket/1).
 
