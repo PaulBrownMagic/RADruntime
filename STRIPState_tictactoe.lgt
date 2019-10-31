@@ -248,15 +248,7 @@
 
     :- public(play/0).
     play :-
-        S = [ grid(board, [ [1, 2, 3]
-                          , [4, 5, 6]
-                          , [7, 8, 9]
-                          ])
-            , player_turn(game, human(x))
-            , current_player(game, human(x))
-            , current_player(game, computer(o, hard))
-            ],
-        sm::init_sit(S),
+        sm::sit(S),
         unicode_terminal::render(S),
         turn.
 

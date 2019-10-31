@@ -3,7 +3,8 @@
                  , rapp
                  , meta(loader)
                  , random(loader)
-                 , 'SitCalc_tictactoe' %_example
                  ]),
+    situation_manager::new(sm, s0),
+    logtalk_load('SitCalc_tictactoe'),
     define_events(after, sm, do(_), _, unicode_terminal)
              )).

@@ -242,8 +242,8 @@
 
     :- public(play/0).
     play :-
-        sm::init_sit(s0),
-        unicode_terminal::render(s0),
+        sm::sit(S),
+        unicode_terminal::render(S),
         turn.
 
     :- public(turn/0).
