@@ -81,16 +81,25 @@
 
 
 :- object(meta_psm,
+    implements(monitoring),
     specializes(metaclass)).
 
     :- public(new/2).
-    new(Instance, File) :-
-        restore(File, SM),
-        ^^instantiate(Instance, [persisting_file_(File), situation_manager_(SM)]).
+    new(SM, File) :-
+        check_make(SM, File),
+        ^^instantiate(_, [persisting_file_(File), situation_manager_(SM)]).
     :- public(new/3).
-    new(Instance, File, Sit) :-
+    new(SM, File, Sit) :-
        situation_manager::new(SM, Sit),
-        ^^instantiate(Instance, [persisting_file_(File), situation_manager_(SM)]).
+        ^^instantiate(_, [persisting_file_(File), situation_manager_(SM)]).
+
+    check_make(SM, _) :-
+        % Already exists.
+        nonvar(SM),
+        instantiates_class(SM, situation_manager), !.
+    check_make(SM, File) :-
+        (nonvar(SM), \+ current_object(SM) ; var(SM)),
+        restore(File, SM).
 
     restore(File, SM) :-
        os::file_exists(File),
@@ -101,6 +110,14 @@
        situation::empty(ET),
        situation_manager::new(SM, ET).
 
+   after(SM, do(_), _Sender) :-
+       self(Self),
+       forall((instantiates_class(Inst, Self), Inst::situation_manager(SM)), Inst::persist).
+
+   after(SM, do(_, SM), _Sender) :-
+       self(Self),
+       forall((instantiates_class(Inst, Self), Inst::situation_manager(SM)), Inst::persist).
+
 :- end_object.
 
 
@@ -109,46 +126,18 @@
     instantiates(meta_psm)).
 
     :- private([persisting_file_/1, situation_manager_/1]).
-    :- protected([situation_manager/1, file/1]).
+    :- public(situation_manager/1).
     situation_manager(SM) :-
         ::situation_manager_(SM).
 
-    file(File) :-
-        ::persisting_file_(File).
-
-    sit_(S) :-
-        ::situation_manager(SM),
-        SM::sit(S).
-
-    :- public(do/1).
-    :- synchronized(do/1).
-    :- mode(do(+object), zero_or_one).
-    :- info(do/1,
-        [ comment is 'Do the Action in the application, thread-safe.'
-        , argnames is ['Action']
-        ]).
-    do(A) :-
-        ::situation_manager(SM),
-        SM::do(A),
-        persist.
-
-    :- public(do/2).
-    do(A, S) :-
-        ::situation_manager(SM),
-        SM::do(A, S),
-        persist.
-
-    :- public(holds/1).
-    holds(F) :-
-        ::situation_manager(SM),
-        SM::holds(F).
-
     :- public(persist/0).
     persist :-
+        ::persisting_file_(File),
         ::situation_manager(SM),
         SM::sit(Sit),
-        ::file(File),
-        setup_call_cleanup(open(File, write, Stream), (write(Stream, 'sit('), writeq(Stream, Sit), write(Stream, ').\n')), close(Stream)).
+        setup_call_cleanup(open(File, write, Stream),
+            (write(Stream, 'sit('), writeq(Stream, Sit), write(Stream, ').\n')),
+            close(Stream)).
 
 :- end_object.
 
@@ -163,7 +152,7 @@
     :- public(do/1).
     :- meta_predicate(do(2)).
     do(A) :-
-        (::acts_upon(SM) ; persistent_manager::only(SM) ; situation_manager::only(SM)), !,
+        (::acts_upon(SM) ; situation_manager::only(SM)), !,
         do(A, SM).
 
     :- public(do/2).

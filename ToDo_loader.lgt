@@ -18,7 +18,7 @@
                      ]),
         persistent_manager::new(sm, 'todo_storage.pl'),
         define_events(after, _, do(_), _, todo_view),
-        define_events(after, _, do(_, _), _, todo_view),
+        define_events(after, _, do(_), _, persistent_manager),
         logtalk_load([ todo_xpce
                      , todo_web
                      ]),
