@@ -46,7 +46,7 @@
 
 % View
 :- object(todo_view,
-    imports(view)).
+    instantiates(view_class)).
 
     :- uses(logtalk, [
             print_message/3

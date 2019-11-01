@@ -202,7 +202,7 @@
 :- end_object.
 
 
-:- object(unicode_terminal, imports(view)).
+:- object(unicode_terminal, instantiates(view_class)).
 
     render(Sit) :-
         board::grid(Board, Sit),

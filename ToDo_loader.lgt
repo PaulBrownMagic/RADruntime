@@ -11,13 +11,12 @@
 		consult(XPath),
 		consult(WPath),
         logtalk_load([ sitcalc(loader)
-                     , os(loader)
                      , random(loader)
-                     , rapp
+                     , bedsit(loader)
                      , todo
                      ]),
         persistent_manager::new(sm, 'todo_storage.pl'),
-        define_events(after, _, do(_), _, todo_view),
+        define_events(after, _, do(_), _, view_class),
         define_events(after, _, do(_), _, persistent_manager),
         logtalk_load([ todo_xpce
                      , todo_web

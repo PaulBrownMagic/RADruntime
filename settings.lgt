@@ -151,6 +151,7 @@ logtalk_make_target_action(all) :-
 :- dynamic(logtalk_library_path/2).
 logtalk_library_path(sitcalc, home('Development/sitcalc/')).
 logtalk_library_path(stripstate, home('Development/stripstate/')).
+logtalk_library_path(bedsit, home('Development/bedsit/')).
 
 /*
 :- multifile(logtalk_library_path/2).

@@ -1,10 +1,10 @@
 :- initialization((
     logtalk_load([ sitcalc(loader)
-                 , rapp
+                 , bedsit(loader)
                  , meta(loader)
                  , random(loader)
                  ]),
     situation_manager::new(sm, s0),
     logtalk_load('SitCalc_tictactoe'),
-    define_events(after, sm, do(_), _, unicode_terminal)
+    define_events(after, sm, do(_), _, view_class)
              )).
